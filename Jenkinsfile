@@ -52,7 +52,7 @@ pipeline {
         }
         cleanup {
             script {
-                docker.image("${IMAGE_NAME}:${env.BUILD_NUMBER}").remove()
+                bat 'docker image prune -f'
             }
         }
     }
