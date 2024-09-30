@@ -29,9 +29,38 @@ public class SportsLogger {
 
     // start the program and display the "main menu"
     public void start() {
+        while (true) {
+            System.out.println("\n--- Sports Logger ---");
+            System.out.println("1. Log an activity");
+            System.out.println("2. View activities");
+            System.out.println("3. Calculate total time for the week");
+            System.out.println("4. Exit");
+            System.out.print("Choose an option: ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1:
+                    getActivityFromUser();
+                    break;
+                case 2:
+                    viewActivities();
+                    break;
+                case 3:
+                    calculateWeeklyTotal();
+                    break;
+                case 4:
+                    System.out.println("Exiting...");
+                    return;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
 
     }
-    // Method  to get activity data from the user
+
+    // Method  to ask for the user input and log the activity
     public void getActivityFromUser() {
         System.out.println("Log a New Activity");
 
@@ -60,6 +89,7 @@ public class SportsLogger {
     private void viewActivities() {
 
     }
+
     // calculate the total time spent on sports activities for the current week
     private void calculateWeeklyTotal() {
 
@@ -68,12 +98,15 @@ public class SportsLogger {
     public int getActivityCount() {
         return activityNames.size();
     }
+
     public String getActivityName(int index) {
         return activityNames.get(index);
     }
+
     public int getActivityDuration(int index) {
         return activityDurations.get(index);
     }
+
     public LocalDate getActivityDate(int index) {
         return activityDates.get(index);
     }
