@@ -22,7 +22,8 @@ public class SportsLogger {
 
     // main method which creates an instance of SportsLogger and starts the program
     public static void main(String[] args) {
-
+        SportsLogger sportsLogger = new SportsLogger();
+        sportsLogger.start();
     }
 
 
