@@ -1,51 +1,59 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven3'
-        jdk 'jdk-17'
+    environment {
+        DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials'
+        IMAGE_NAME = 'mikt90/sportstracker'
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-
-                checkout scm
-            }
-        }
-
         stage('Build') {
             steps {
-
-                bat 'mvn clean package'
+                bat 'mvn clean install'
             }
         }
 
         stage('Test') {
             steps {
-
                 bat 'mvn test'
             }
         }
 
         stage('Code Coverage') {
             steps {
-
-                bat 'mvn jacoco:report'
                 jacoco execPattern: '**/target/jacoco.exec'
             }
         }
 
-        stage('Publish Test Results') {
+        stage('Build Docker Image') {
             steps {
-                junit '**/target/surefire-reports/*.xml'
+                script {
+                    docker.build("${IMAGE_NAME}:${env.BUILD_NUMBER}")
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', "${DOCKER_HUB_CREDENTIALS}") {
+                        docker.image("${IMAGE_NAME}:${env.BUILD_NUMBER}").push()
+                        docker.image("${IMAGE_NAME}:${env.BUILD_NUMBER}").push('latest')
+                    }
+                }
             }
         }
     }
 
     post {
         always {
+            junit '**/target/surefire-reports/*.xml'
             echo 'Pipeline completed.'
+        }
+        cleanup {
+            script {
+                docker.image("${IMAGE_NAME}:${env.BUILD_NUMBER}").remove()
+            }
         }
     }
 }
