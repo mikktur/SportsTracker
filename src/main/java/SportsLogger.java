@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -64,16 +65,47 @@ public class SportsLogger {
     public void getActivityFromUser() {
         System.out.println("Log a New Activity");
 
-        System.out.print("Enter activity name: ");
-        String name = scanner.nextLine();
+        //if the user does not enter a name, the default name will be "Activity" + the number of activities logged
+        String name = "Activity " + (getActivityCount() + 1);
+        System.out.print("Enter activity name (or leave blank to use default): ");
+        String userInput = scanner.nextLine();
+        if (!userInput.trim().isEmpty()) {
+            name = userInput;
+        } else {
+            System.out.println("No name entered. Activity will be logged as: " + name);
+        }
 
-        System.out.print("Enter duration in minutes: ");
-        String durationString = scanner.nextLine();
-        int duration = Integer.parseInt(durationString);
+        int duration = 0;
+        //ask the user for the duration of the activity, the input must be a positive number
+        while (true) {
+            try {
+                System.out.print("Enter duration in minutes: ");
+                String durationString = scanner.nextLine();
+                duration = Integer.parseInt(durationString);
 
-        System.out.print("Enter date (yyyy-MM-dd): ");
-        String dateString = scanner.nextLine();
-        LocalDate date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                if (duration <= 0) {
+                    System.out.println("Duration must be a positive number. Please try again.");
+                    continue;
+                }
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number for the duration.");
+            }
+        }
+
+        LocalDate date = null;
+        //ask the user for the date of the activity, the input must be in the format yyyy-MM-dd
+        while (true) {
+            try {
+                System.out.print("Enter date (yyyy-MM-dd): ");
+                String dateString = scanner.nextLine();
+                date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                break;
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please enter the date in the format yyyy-MM-dd.");
+            }
+        }
+
         logActivity(name, duration, date);
     }
 
@@ -87,9 +119,22 @@ public class SportsLogger {
 
     // display all the activities that have been logged
     private void viewActivities() {
-
+        List<String> formattedActivities = getFormattedActivities();
+        for (String activity : formattedActivities) {
+            System.out.println(activity);
+        }
     }
-
+    public List<String> getFormattedActivities() {
+        List<String> formattedActivities = new ArrayList<>();
+        if (activityNames.isEmpty()) {
+            formattedActivities.add("No activities logged.");
+        } else {
+            for (int i = 0; i < activityNames.size(); i++) {
+                formattedActivities.add("Activity: " + activityNames.get(i) + ", Duration: " + activityDurations.get(i) + " minutes, Date: " + activityDates.get(i));
+            }
+        }
+        return formattedActivities;
+    }
     // calculate the total time spent on sports activities for the current week
     private void calculateWeeklyTotal() {
 
