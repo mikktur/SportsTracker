@@ -49,7 +49,7 @@ public class SportsLogger {
                     viewActivities();
                     break;
                 case 3:
-                    calculateWeeklyTotal();
+                    displayWeeklyTotal();
                     break;
                 case 4:
                     System.out.println("Exiting...");
@@ -124,6 +124,7 @@ public class SportsLogger {
             System.out.println(activity);
         }
     }
+
     public List<String> getFormattedActivities() {
         List<String> formattedActivities = new ArrayList<>();
         if (activityNames.isEmpty()) {
@@ -135,11 +136,28 @@ public class SportsLogger {
         }
         return formattedActivities;
     }
+
     // calculate the total time spent on sports activities for the current week
-    private void calculateWeeklyTotal() {
+    public void displayWeeklyTotal() {
 
+        int totalDuration = calculateWeeklyTotal();
+
+        System.out.println("Total time spent on sports this week: " + totalDuration + " minutes.");
     }
+    // calculate the total time spent on sports activities for the last 7 days
+    public int calculateWeeklyTotal(){
+        int totalDuration = 0;
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = today.minusDays(6);
 
+        for (int i = 0; i < activityDates.size(); i++) {
+            LocalDate activityDate = activityDates.get(i);
+            if (!activityDate.isBefore(startDate) && !activityDate.isAfter(today)) {
+                totalDuration += activityDurations.get(i);
+            }
+        }
+        return totalDuration;
+    }
     public int getActivityCount() {
         return activityNames.size();
     }
